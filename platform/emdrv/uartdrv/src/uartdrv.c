@@ -161,7 +161,7 @@
 static bool uartdrvHandleIsInitialized = false;
 static UARTDRV_Handle_t uartdrvHandle[EMDRV_UARTDRV_MAX_DRIVER_INSTANCES];
 #endif
-static bool enableRxWhenSleeping = UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION;
+static const bool enableRxWhenSleeping = UARTDRV_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION;
 
 //****************************************************************************
 
