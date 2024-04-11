@@ -823,7 +823,7 @@ static bool ReceiveDmaComplete(unsigned int channel,
   CORE_ENTER_ATOMIC();
 
   if (buffer->callback != NULL) {
-    buffer->callback(handle, buffer->transferStatus, buffer->data, buffer->transferCount - buffer->itemsRemaining);
+    buffer->callback(handle, buffer->transferStatus, buffer->data, buffer->transferCount - buffer->itemsRemaining, buffer->userParam);
   }
   // Dequeue the current tail Rx operation, check if more in queue
   DequeueBuffer(handle->rxQueue, &buffer);
@@ -973,7 +973,7 @@ static bool TransmitDmaComplete(unsigned int channel,
   CORE_ENTER_ATOMIC();
 
   if (buffer->callback != NULL) {
-    buffer->callback(handle, ECODE_EMDRV_UARTDRV_OK, buffer->data, buffer->transferCount);
+    buffer->callback(handle, ECODE_EMDRV_UARTDRV_OK, buffer->data, buffer->transferCount, buffer->userParam);
   }
   // Dequeue the current tail Tx operation, check if more in queue
   DequeueBuffer(handle->txQueue, &buffer);
@@ -2236,7 +2236,8 @@ Ecode_t UARTDRV_Abort(UARTDRV_Handle_t handle, UARTDRV_AbortType_t type)
           txBuffer->callback(handle,
                              ECODE_EMDRV_UARTDRV_ABORTED,
                              NULL,
-                             txBuffer->itemsRemaining);
+                             txBuffer->itemsRemaining,
+                             txBuffer->userParam);
         }
       }
     }
@@ -2267,7 +2268,8 @@ Ecode_t UARTDRV_Abort(UARTDRV_Handle_t handle, UARTDRV_AbortType_t type)
           rxBuffer->callback(handle,
                              ECODE_EMDRV_UARTDRV_ABORTED,
                              NULL,
-                             rxBuffer->itemsRemaining);
+                             rxBuffer->itemsRemaining,
+                             rxBuffer->userParam);
         }
       }
     }
@@ -2806,7 +2808,8 @@ Ecode_t UARTDRV_PauseTransmit(UARTDRV_Handle_t handle)
 Ecode_t UARTDRV_Receive(UARTDRV_Handle_t handle,
                         uint8_t *data,
                         UARTDRV_Count_t count,
-                        UARTDRV_Callback_t callback)
+                        UARTDRV_Callback_t callback,
+                        void *userParam)
 {
   Ecode_t retVal;
   UARTDRV_Buffer_t outputBuffer;
@@ -2820,6 +2823,7 @@ Ecode_t UARTDRV_Receive(UARTDRV_Handle_t handle,
   outputBuffer.transferCount = count;
   outputBuffer.itemsRemaining = count;
   outputBuffer.callback = callback;
+  outputBuffer.userParam = userParam;
   outputBuffer.transferStatus = ECODE_EMDRV_UARTDRV_WAITING;
 
   retVal = EnqueueBuffer(handle->rxQueue, &outputBuffer, &queueBuffer);
@@ -2939,7 +2943,8 @@ Ecode_t UARTDRV_ResumeTransmit(UARTDRV_Handle_t handle)
 Ecode_t UARTDRV_Transmit(UARTDRV_Handle_t handle,
                          uint8_t *data,
                          UARTDRV_Count_t count,
-                         UARTDRV_Callback_t callback)
+                         UARTDRV_Callback_t callback,
+                         void *userParam)
 {
   Ecode_t retVal;
   UARTDRV_Buffer_t inputBuffer;
@@ -2954,6 +2959,7 @@ Ecode_t UARTDRV_Transmit(UARTDRV_Handle_t handle,
   inputBuffer.transferCount = count;
   inputBuffer.itemsRemaining = count;
   inputBuffer.callback = callback;
+  inputBuffer.userParam = userParam;
   inputBuffer.transferStatus = ECODE_EMDRV_UARTDRV_WAITING;
 
 #if defined(LEUART_COUNT) && (LEUART_COUNT > 0) && !defined(_SILICON_LABS_32B_SERIES_2)

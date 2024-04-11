@@ -185,7 +185,8 @@ struct UARTDRV_HandleData;
 typedef void (*UARTDRV_Callback_t)(struct UARTDRV_HandleData *handle,
                                    Ecode_t transferStatus,
                                    uint8_t *data,
-                                   UARTDRV_Count_t transferCount);
+                                   UARTDRV_Count_t transferCount,
+                                   void *userParam);
 
 /// UART transfer buffer
 typedef struct {
@@ -193,6 +194,7 @@ typedef struct {
   UARTDRV_Count_t transferCount;           ///< Transfer item count
   volatile UARTDRV_Count_t itemsRemaining; ///< Transfer items remaining
   UARTDRV_Callback_t callback;             ///< Completion callback
+  void *userParam;                         ///< User-specified callback parameter
   Ecode_t transferStatus;                  ///< Completion status of the transfer operation
 } UARTDRV_Buffer_t;
 
@@ -441,12 +443,14 @@ uint8_t UARTDRV_GetTransmitDepth(UARTDRV_Handle_t handle);
 Ecode_t UARTDRV_Transmit(UARTDRV_Handle_t handle,
                          uint8_t *data,
                          UARTDRV_Count_t count,
-                         UARTDRV_Callback_t callback);
+                         UARTDRV_Callback_t callback,
+                         void *userParam);
 
 Ecode_t UARTDRV_Receive(UARTDRV_Handle_t handle,
                         uint8_t *data,
                         UARTDRV_Count_t count,
-                        UARTDRV_Callback_t callback);
+                        UARTDRV_Callback_t callback,
+                        void *userParam);
 
 Ecode_t UARTDRV_TransmitB(UARTDRV_Handle_t handle,
                           uint8_t *data,
