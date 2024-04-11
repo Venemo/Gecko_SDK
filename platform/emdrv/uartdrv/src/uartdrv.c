@@ -2235,7 +2235,7 @@ Ecode_t UARTDRV_Abort(UARTDRV_Handle_t handle, UARTDRV_AbortType_t type)
         if (txBuffer->callback != NULL) {
           txBuffer->callback(handle,
                              ECODE_EMDRV_UARTDRV_ABORTED,
-                             NULL,
+                             txBuffer->data,
                              txBuffer->itemsRemaining,
                              txBuffer->userParam);
         }
@@ -2267,7 +2267,7 @@ Ecode_t UARTDRV_Abort(UARTDRV_Handle_t handle, UARTDRV_AbortType_t type)
         if (rxBuffer->callback != NULL) {
           rxBuffer->callback(handle,
                              ECODE_EMDRV_UARTDRV_ABORTED,
-                             NULL,
+                             rxBuffer->data,
                              rxBuffer->itemsRemaining,
                              rxBuffer->userParam);
         }
