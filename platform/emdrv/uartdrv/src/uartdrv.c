@@ -2246,6 +2246,10 @@ Ecode_t UARTDRV_Abort(UARTDRV_Handle_t handle, UARTDRV_AbortType_t type)
     // on subsequent transfers
     while (!(UARTDRV_GetPeripheralStatus(handle) & UARTDRV_STATUS_TXIDLE)) {
     }
+
+    if (handle->em1RequestCount > 0) {
+      em1RequestRemove(handle);
+    }
   }
   if ((type == uartdrvAbortReceive) || (type == uartdrvAbortAll)) {
     // Stop the current transfer
@@ -2278,10 +2282,10 @@ Ecode_t UARTDRV_Abort(UARTDRV_Handle_t handle, UARTDRV_AbortType_t type)
     if (handle->fcType != uartdrvFlowControlHwUart) {
       DisableReceiver(handle);
     }
-  }
 
-  if (handle->em1RequestCount > 0) {
-    em1RequestRemove(handle);
+    if (enableRxWhenSleeping && handle->em1RequestCount > 0) {
+      em1RequestRemove(handle);
+    }
   }
 
   CORE_EXIT_ATOMIC();
