@@ -1731,9 +1731,6 @@ Ecode_t UARTDRV_InitLeuart(UARTDRV_Handle_t handle,
   CMU_ClockEnable(cmuClock_HFPER, true);
 #endif
   CMU_ClockEnable(cmuClock_GPIO, true);
-#if defined(_CMU_HFBUSCLKEN0_MASK) || defined(CMU_HFCORECLKEN0_LE)
-  CMU_ClockEnable(cmuClock_HFLE, true);
-#endif
 
   // Only try to use LF clock if LFXO or LFRCO is enabled and requested baudrate is low
   if (CMU->STATUS & CMU_STATUS_LFXOENS
@@ -1743,6 +1740,9 @@ Ecode_t UARTDRV_InitLeuart(UARTDRV_Handle_t handle,
              && (leuartInit.baudrate <= SystemLFRCOClockGet())) {
     CMU_CLOCK_SELECT_SET(LFB, LFRCO);
   } else {
+#if defined(_CMU_HFBUSCLKEN0_MASK) || defined(CMU_HFCORECLKEN0_LE)
+    CMU_ClockEnable(cmuClock_HFLE, true);
+#endif
     // Try to figure out the prescaler that will give us the best stability
     CMU_CLOCK_SELECT_SET(LFB, HFCLKLE);
 
